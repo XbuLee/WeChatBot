@@ -1,0 +1,9 @@
+# tomcat接口地址访问地址
+server:
+  port: 8081
+
+
+# 连接到webSocket 连接地址
+wechat:
+  bot:
+    url: ws://localhost:5555
