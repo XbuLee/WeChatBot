@@ -7,3 +7,15 @@ server:
 wechat:
   bot:
     url: ws://localhost:5555
+
+
+api:
+  default.url: http://81.70.100.130/api/xiaoai.php?msg=%s&n=text
+  xiaohua.url: http://81.70.100.130/api/qwxh.php
+  tianqi:
+    url: https://api.seniverse.com/v3/weather/now.json?key=%s&location=%s
+    token: SCYrvkytJze9qyzOh
+  image.url: https://api.oick.cn/random/api.php
+  qinghua:
+    url: https://v2.alapi.cn/api/qinghua?token=%s
+    token: xK4SBp4YI5OoQE8m

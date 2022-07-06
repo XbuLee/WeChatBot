@@ -18,7 +18,7 @@ public enum MsgType {
   ADD_FRIEND(37),
   AGREE_TO_ADD_FRIEND(10000),
   //发送文字消息
-  SEND_TXT_STATUS(555),
+  SEND_TXT(555),
   SEND_PIC(500),
   SEND_AT(550),
   //接收文字消息

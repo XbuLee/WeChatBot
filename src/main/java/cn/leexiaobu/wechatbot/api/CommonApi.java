@@ -1,9 +1,7 @@
 package cn.leexiaobu.wechatbot.api;
 
-/**
- * @date 2022-07-05
- */
-public interface CommonApi {
+import cn.leexiaobu.wechatbot.domain.WechatMsg;
 
-  public String getTxtResponse(String content);
+public abstract class CommonApi {
+    public abstract WechatMsg getWeChatMsg(String content, String wxid);
 }
