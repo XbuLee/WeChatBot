@@ -19,3 +19,5 @@ api:
   qinghua:
     url: https://v2.alapi.cn/api/qinghua?token=%s
     token: xK4SBp4YI5OoQE8m
+  shadiao:
+    url: http://jandan.net/
