@@ -3,10 +3,14 @@ package cn.leexiaobu.wechatbot.handler;
 import cn.hutool.core.map.CaseInsensitiveMap;
 import cn.leexiaobu.wechatbot.api.*;
 import cn.leexiaobu.wechatbot.client.WechatBotClient;
+import cn.leexiaobu.wechatbot.config.MyEnvironmentUtil;
 import cn.leexiaobu.wechatbot.domain.WechatMsg;
 import cn.leexiaobu.wechatbot.enums.MsgType;
 import com.alibaba.fastjson.JSONObject;
+import java.util.Arrays;
+import java.util.HashSet;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -21,6 +25,14 @@ public class SimpleMsgHandler implements MsgHandler {
 
   static CaseInsensitiveMap<String, CommonApi> instanceHashMap = new CaseInsensitiveMap<>();
   static HashMap<String, String> stringToCommand = new HashMap<>();
+  HashSet<String> roomSet = new HashSet<>();
+
+  public SimpleMsgHandler() {
+    System.out.println("初始化");
+    String apiString = MyEnvironmentUtil.getString("wechat.roomId");
+    String[] split = apiString.split(",");
+    roomSet.addAll(Arrays.asList(split));
+  }
 
   static {
     //默认小爱同学
@@ -76,7 +88,7 @@ public class SimpleMsgHandler implements MsgHandler {
 
   private void onRecTxtMsg(WechatBotClient client, WechatMsg msg) {
     String wxid = msg.getWxid();
-    if ("1730311071@chatroom".equals(wxid) || "23177834269@chatroom".equals(wxid)) {
+    if (roomSet.contains(wxid)) {
       String content = msg.getContent();
       if (content.startsWith("#")) {
         log.info("收到指令：" + content);

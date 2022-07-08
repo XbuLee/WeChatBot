@@ -7,7 +7,7 @@ server:
 wechat:
   bot:
     url: ws://localhost:5555
-
+  roomId: 1730311071@chatroom,23177834269@chatroom
 
 api:
   default.url: http://81.70.100.130/api/xiaoai.php?msg=%s&n=text
