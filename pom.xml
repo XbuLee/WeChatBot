@@ -23,8 +23,16 @@
         <hutool.version>5.8.4</hutool.version>
         <mybatis.plus.version>3.5.1</mybatis.plus.version>
         <mysql.version>8.0.18</mysql.version>
+        <net.version>3.8.0</net.version>
     </properties>
     <dependencies>
+        <!-- https://mvnrepository.com/artifact/commons-net/commons-net -->
+        <dependency>
+            <groupId>commons-net</groupId>
+            <artifactId>commons-net</artifactId>
+            <version>${net.version}</version>
+        </dependency>
+
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
