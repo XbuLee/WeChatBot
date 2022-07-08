@@ -5,6 +5,7 @@ import static cn.leexiaobu.wechatbot.common.WechatBotCommon.NULL_MSG;
 import static cn.leexiaobu.wechatbot.common.WechatBotCommon.TXT_MSG;
 
 import cn.leexiaobu.wechatbot.domain.WechatMsg;
+import cn.leexiaobu.wechatbot.enums.MsgType;
 import cn.leexiaobu.wechatbot.handler.MsgHandler;
 import com.alibaba.fastjson.JSONObject;
 import java.net.URI;
@@ -64,7 +65,7 @@ public class WechatBotClient extends WebSocketClient {
   }
 
   public void sendTxtMsg(WechatMsg wechatMsg){
-    wechatMsg.setType(TXT_MSG);
+    wechatMsg.setType(MsgType.SEND_TXT.TYPE());
     sendMsg(wechatMsg);
   }
   /**
