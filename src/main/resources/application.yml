@@ -1,3 +1,10 @@
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://192.168.191.123/wechat?serverTimezone=UTC
+    username: root
+    password: root
+
 # tomcat接口地址访问地址
 server:
   port: 8081
@@ -19,5 +26,7 @@ api:
   qinghua:
     url: https://v2.alapi.cn/api/qinghua?token=%s
     token: xK4SBp4YI5OoQE8m
+
+
   shadiao:
     url: http://jandan.net/

@@ -3,16 +3,21 @@ package cn.leexiaobu.wechatbot.handler;
 import cn.hutool.core.map.CaseInsensitiveMap;
 import cn.leexiaobu.wechatbot.api.*;
 import cn.leexiaobu.wechatbot.client.WechatBotClient;
+import cn.leexiaobu.wechatbot.domain.Msg;
+import cn.leexiaobu.wechatbot.domain.WeChatTxtMsg;
 import cn.leexiaobu.wechatbot.config.MyEnvironmentUtil;
 import cn.leexiaobu.wechatbot.domain.WechatMsg;
 import cn.leexiaobu.wechatbot.enums.MsgType;
+import cn.leexiaobu.wechatbot.mapper.MsgMapper;
 import com.alibaba.fastjson.JSONObject;
 import java.util.Arrays;
 import java.util.HashSet;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.stream.Collectors;
 
@@ -22,7 +27,8 @@ import java.util.stream.Collectors;
 @Service
 @Slf4j
 public class SimpleMsgHandler implements MsgHandler {
-
+    @Autowired
+    MsgMapper msgMapper;
   static CaseInsensitiveMap<String, CommonApi> instanceHashMap = new CaseInsensitiveMap<>();
   static HashMap<String, String> stringToCommand = new HashMap<>();
   HashSet<String> roomSet = new HashSet<>();
@@ -106,6 +112,20 @@ public class SimpleMsgHandler implements MsgHandler {
         WechatMsg weChatMsg = apiInstance.getWeChatMsg(command, wxid);
         client.sendMsg(weChatMsg);
       }
+            WeChatTxtMsg weChatTxtMsg = JSONObject.parseObject(original, WeChatTxtMsg.class);
+            Msg msgDo = new Msg();
+            msgDo.setSrvid(weChatTxtMsg.getSrvid());
+            msgDo.setMsgid(weChatTxtMsg.getId());
+            msgDo.setStatus(0);
+            msgDo.setIssend(1);
+            msgDo.setIsshowtimer(1);
+            msgDo.setCreatetime(new Date());
+            msgDo.setTalker(weChatTxtMsg.getId1());
+            msgDo.setNickname(weChatTxtMsg.getId1());
+            msgDo.setRoomid(weChatTxtMsg.getId2());
+            msgDo.setContent(weChatTxtMsg.getContent());
+            msgDo.setType(weChatTxtMsg.getType());
+            msgMapper.insert(msgDo);
     }
   }
 
