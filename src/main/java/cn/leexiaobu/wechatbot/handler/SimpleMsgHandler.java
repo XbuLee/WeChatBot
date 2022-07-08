@@ -80,7 +80,7 @@ public class SimpleMsgHandler implements MsgHandler {
         break;
       case REC_TXT_MSG:
         log.info("文本原始数据:{}", s);
-        onRecTxtMsg(client, wechatMsg);
+        onRecTxtMsg(client, wechatMsg,s);
         break;
       case REC_PIC_MSG:
         log.info("图片原始数据:{}", s);
@@ -92,7 +92,7 @@ public class SimpleMsgHandler implements MsgHandler {
     }
   }
 
-  private void onRecTxtMsg(WechatBotClient client, WechatMsg msg) {
+  private void onRecTxtMsg(WechatBotClient client, WechatMsg msg, String original) {
     String wxid = msg.getWxid();
     if (roomSet.contains(wxid)) {
       String content = msg.getContent();
