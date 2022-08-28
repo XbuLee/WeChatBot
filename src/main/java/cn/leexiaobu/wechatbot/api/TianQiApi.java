@@ -2,6 +2,7 @@ package cn.leexiaobu.wechatbot.api;
 
 import cn.hutool.http.HttpUtil;
 import cn.leexiaobu.wechatbot.api.entiy.TianQiEntity;
+import cn.leexiaobu.wechatbot.client.WechatBotClient;
 import cn.leexiaobu.wechatbot.config.MyEnvironmentUtil;
 import cn.leexiaobu.wechatbot.domain.WechatMsg;
 import cn.leexiaobu.wechatbot.enums.MsgType;
@@ -13,7 +14,7 @@ public class TianQiApi extends CommonApi {
     String token = MyEnvironmentUtil.getApiString("tianqi.token");
 
     @Override
-    public WechatMsg getWeChatMsg(String content, String wxid) {
+    public void handleMsg(String content, String wxid, WechatBotClient client) {
         String[] split = locationString.split(",");
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < split.length; i++) {
@@ -22,6 +23,6 @@ public class TianQiApi extends CommonApi {
             TianQiEntity tianQiEntity = JSONObject.parseObject(s, TianQiEntity.class);
             sb.append(tianQiEntity.getResult()).append("\n");
         }
-        return new WechatMsg(sb.toString(), wxid, MsgType.SEND_TXT.TYPE());
+        client.sendTxtMsg(sb.toString(),wxid);
     }
 }

@@ -4,6 +4,7 @@ import cn.hutool.cache.CacheUtil;
 import cn.hutool.cache.impl.TimedCache;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.http.HttpUtil;
+import cn.leexiaobu.wechatbot.client.WechatBotClient;
 import cn.leexiaobu.wechatbot.config.MyEnvironmentUtil;
 import cn.leexiaobu.wechatbot.domain.WechatMsg;
 import cn.leexiaobu.wechatbot.enums.MsgType;
@@ -36,8 +37,17 @@ public class ShaDiaoTuApi extends CommonApi {
 //        hashMap.put("top-ooxx", 57);
     }
 
+    public static void main(String[] args) {
+        ShaDiaoTuApi shaDiaoTuApi = new ShaDiaoTuApi();
+        System.out.println(shaDiaoTuApi.random.nextInt(100));
+        System.out.println(shaDiaoTuApi.random.nextInt(100));
+        System.out.println(shaDiaoTuApi.random.nextInt(100));
+        System.out.println(shaDiaoTuApi.random.nextInt(100));
+
+    }
+
     @Override
-    public WechatMsg getWeChatMsg(String content, String wxid) {
+    public void handleMsg(String content, String wxid, WechatBotClient client) {
         long now = System.currentTimeMillis();
         if (picInfos.isEmpty() || now - lastUpdateTime > 3600000) {
             lastUpdateTime = now;
@@ -64,16 +74,7 @@ public class ShaDiaoTuApi extends CommonApi {
         String fileName = now + "." + suffix;
         File file = new File(fileName);
         HttpUtil.downloadFile(url, file);
-        return new WechatMsg(file.getAbsolutePath(), wxid, MsgType.SEND_PIC.TYPE());
-    }
-
-    public static void main(String[] args) {
-        ShaDiaoTuApi shaDiaoTuApi = new ShaDiaoTuApi();
-        System.out.println(shaDiaoTuApi.random.nextInt(100));
-        System.out.println(shaDiaoTuApi.random.nextInt(100));
-        System.out.println(shaDiaoTuApi.random.nextInt(100));
-        System.out.println(shaDiaoTuApi.random.nextInt(100));
-
+        client.sendPicMsg(file.getAbsolutePath(), wxid);
     }
 }
 

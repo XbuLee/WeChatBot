@@ -3,23 +3,17 @@ package cn.leexiaobu.wechatbot.handler;
 import cn.hutool.core.map.CaseInsensitiveMap;
 import cn.leexiaobu.wechatbot.api.*;
 import cn.leexiaobu.wechatbot.client.WechatBotClient;
-import cn.leexiaobu.wechatbot.domain.Msg;
-import cn.leexiaobu.wechatbot.domain.WeChatTxtMsg;
 import cn.leexiaobu.wechatbot.config.MyEnvironmentUtil;
 import cn.leexiaobu.wechatbot.domain.WechatMsg;
 import cn.leexiaobu.wechatbot.enums.MsgType;
-import cn.leexiaobu.wechatbot.mapper.MsgMapper;
 import com.alibaba.fastjson.JSONObject;
 
 import java.util.Arrays;
 import java.util.HashSet;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
 import java.util.HashMap;
 import java.util.stream.Collectors;
 
@@ -29,15 +23,17 @@ import java.util.stream.Collectors;
 @Service
 @Slf4j
 public class SimpleMsgHandler implements MsgHandler {
-    @Autowired
-    MsgMapper msgMapper;
+    //    @Autowired
+//    MsgMapper msgMapper;
     static CaseInsensitiveMap<String, CommonApi> instanceHashMap = new CaseInsensitiveMap<>();
     static HashMap<String, String> stringToCommand = new HashMap<>();
     HashSet<String> roomSet = new HashSet<>();
+    private String xbwxid;
 
     public SimpleMsgHandler() {
         System.out.println("初始化");
         String apiString = MyEnvironmentUtil.getString("wechat.roomId");
+        xbwxid = MyEnvironmentUtil.getString("wechat.xb_wxid");
         String[] split = apiString.split(",");
         roomSet.addAll(Arrays.asList(split));
     }
@@ -45,6 +41,9 @@ public class SimpleMsgHandler implements MsgHandler {
     static {
         //默认小爱同学
         instanceHashMap.put("xm", new DefaultApi());
+        instanceHashMap.put("xa", new XiaoAiApi());
+        stringToCommand.put("xb", "xb");
+        instanceHashMap.put("xb", new XiaoBinApi());
         //笑话
         stringToCommand.put("xh", "xh");
         stringToCommand.put("笑话", "xh");
@@ -56,7 +55,7 @@ public class SimpleMsgHandler implements MsgHandler {
         //天气
         stringToCommand.put("天气", "tq");
         stringToCommand.put("tq", "tq");
-        instanceHashMap.put("tq", new TianQiApi());
+        instanceHashMap.put("tq", new QWeatherApi());
 
         //情话
         stringToCommand.put("情话", "qh");
@@ -67,11 +66,6 @@ public class SimpleMsgHandler implements MsgHandler {
         stringToCommand.put("沙雕图", "sdt");
         stringToCommand.put("sdt", "sdt");
         instanceHashMap.put("sdt", new ShaDiaoTuApi());
-        //游戏
-        stringToCommand.put("game", "game");
-        stringToCommand.put("游戏", "game");
-        stringToCommand.put("开始游戏", "game");
-        instanceHashMap.put("game", new GameApi());
     }
 
 
@@ -106,39 +100,33 @@ public class SimpleMsgHandler implements MsgHandler {
             if (content.startsWith("#")) {
                 log.info("收到指令：" + content);
                 String command = content.replace("#", "");
-                if ("help".equals(command)) {
-                    String help = instanceHashMap.entrySet().stream()
-                            .filter(key -> !"xm".equals(key.getKey()))
-                            .map(entry -> "#" + entry.getKey())
-                            .collect(Collectors.joining("\n"));
-                    WechatMsg weChatMsg = new WechatMsg(help, wxid, MsgType.SEND_TXT.TYPE());
-                    client.sendMsg(weChatMsg);
+                //功能性指令
+                if (checkIfFunctionCommand(command, wxid, client)) {
                     return;
                 }
+                //常规指令
                 CommonApi apiInstance = getApiInstance(command);
-                WechatMsg weChatMsg = apiInstance.getWeChatMsg(command, wxid);
-                client.sendMsg(weChatMsg);
-            } else if (content.startsWith("*")) {
-                String command = content.replace("*", "");
-                log.info("游戏指令：" + command);
-                GameApi apiInstance = (GameApi) getApiInstance("game");
-                apiInstance.getWeChatMsg(command, wxid,client);
+                apiInstance.handleMsg(command, wxid, client);
             }
-            WeChatTxtMsg weChatTxtMsg = JSONObject.parseObject(original, WeChatTxtMsg.class);
-            Msg msgDo = new Msg();
-            msgDo.setSrvid(weChatTxtMsg.getSrvid());
-            msgDo.setMsgid(weChatTxtMsg.getId());
-            msgDo.setStatus(0);
-            msgDo.setIssend(1);
-            msgDo.setIsshowtimer(1);
-            msgDo.setCreatetime(new Date());
-            msgDo.setTalker(weChatTxtMsg.getId1());
-            msgDo.setNickname(weChatTxtMsg.getId1());
-            msgDo.setRoomid(weChatTxtMsg.getId2());
-            msgDo.setContent(weChatTxtMsg.getContent());
-            msgDo.setType(weChatTxtMsg.getType());
-//            msgMapper.insert(msgDo);
+        } else if (xbwxid.equals(wxid)) {
+            XiaoBinApi apiInstance = (XiaoBinApi) getApiInstance("xb");
+            apiInstance.handMsgFromXb(msg.getContent().replace("小冰","小爱"), wxid, client);
         }
+    }
+
+    private boolean checkIfFunctionCommand(String command, String wxid, WechatBotClient client) {
+        //help单独处理
+        if ("help".equals(command)) {
+            String help = instanceHashMap.entrySet().stream()
+                    .filter(key -> !"xm".equals(key.getKey()))
+                    .map(entry -> "#" + entry.getKey())
+                    .collect(Collectors.joining("\n"));
+            client.sendTxtMsg(help, wxid);
+            return true;
+        } else if ("qhai".equals(command)) {
+            return true;
+        }
+        return false;
     }
 
     //通过命令查找对应的API
@@ -147,7 +135,7 @@ public class SimpleMsgHandler implements MsgHandler {
         String realContent = result[0];
         String command = stringToCommand.get(realContent);
         if (command == null) {
-            return instanceHashMap.get("xm");
+            return instanceHashMap.get("xa");
         } else {
             return instanceHashMap.get(command);
         }

@@ -1,6 +1,7 @@
 package cn.leexiaobu.wechatbot.api;
 
 import cn.hutool.http.HttpUtil;
+import cn.leexiaobu.wechatbot.client.WechatBotClient;
 import cn.leexiaobu.wechatbot.config.MyEnvironmentUtil;
 import cn.leexiaobu.wechatbot.domain.WechatMsg;
 import cn.leexiaobu.wechatbot.enums.MsgType;
@@ -13,7 +14,7 @@ public class ImageApi extends CommonApi {
     String url = MyEnvironmentUtil.getApiString("image.url");
 
     @Override
-    public WechatMsg getWeChatMsg(String content, String wxid) {
+    public void handleMsg(String content, String wxid, WechatBotClient client) {
         String fileName = System.currentTimeMillis() + ".jpg";
         String redirectUrl = null;
         try {
@@ -25,7 +26,7 @@ public class ImageApi extends CommonApi {
         String prefix = url.substring(0, url.lastIndexOf("/") + 1);
         HttpUtil.downloadFile(prefix + redirectUrl, file);
         String absolutePath = file.getAbsolutePath();
-        return new WechatMsg(absolutePath, wxid, MsgType.SEND_PIC.TYPE());
+        client.sendPicMsg(absolutePath, wxid);
     }
 
     private String getRedirectUrl(String path) throws Exception {

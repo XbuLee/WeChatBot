@@ -15,10 +15,12 @@ wechat:
   bot:
     url: ws://localhost:5555
   roomId: 1730311071@chatroom,23177834269@chatroom
+  xb_wxid: gh_18bdc49db162
 
 api:
   default.url: http://81.70.100.130/api/xiaoai.php?msg=%s&n=text
   xiaohua.url: http://81.70.100.130/api/qwxh.php
+  xiaoai.url: https://jintia.jintias.cn/api/xatx.php?type=text&msg=%s
   tianqi:
     url: https://api.seniverse.com/v3/weather/now.json?key=%s&location=%s
     token: SCYrvkytJze9qyzOh
@@ -32,3 +34,9 @@ api:
 
   shadiao:
     url: http://jandan.net/
+
+  qweather:
+#    location: 北京,101010100#成都,101270101#呼和浩特,101080101#宁波,101210401#西安,101110101#嘉善,101210302
+    location: 北京,101010100#成都,101270101#呼和浩特,101080101#宁波,101210401#嘉善,101210302#哈尔滨,101050101
+    url: https://devapi.qweather.com/v7/%s/now?location=%s&key=%s
+    key: 18e72c22fb58460f99d22267b7a54b7b
